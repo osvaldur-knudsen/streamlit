@@ -1,23 +1,29 @@
 
 import pandas as pd
+import streamlit as st
 import numpy as np
 from datetime import datetime
-pd.options.display.float_format = '{:,.2f}'.format
+pd.options.display.float_format = '{:,.0f}'.format
 
 
 # Calc functions
 def profit():
     df['profit'] = df['income'] - df['expenses']
 
+#Streamlit layout
+container1 = st.beta_container()
+container2 = st.beta_container()
+container3 = st.beta_container()
+
+
 # Data
 np.random.seed(10)
 date_rng = pd.date_range(start='12/31/2018', end='12/31/2021', freq='Y').year
 data = {'income':np.random.randint(50,100, size=(len(date_rng))),
        'expenses':np.random.randint(0,50, size=(len(date_rng)))}
-growth = 0.21
 
 # Assumptions
-rev_growth = 0.21
+rev_growth = container3.slider('select income growth in 2022', min_value=0.0, max_value=0.2, value=0.1)
 
 # Dataframe
 df = pd.DataFrame(data = data, index = date_rng )
@@ -38,17 +44,15 @@ profit()
 df[list(df.columns)] = df[list(df.columns)].apply(pd.to_numeric)
 print(df.transpose())
 
-#Streamlit
-import streamlit as st
+# Streamlit
+container1.title('BigCo 2022 budget')
+container1.write("Revenues growing at a steady pace")
+container2.dataframe(df.transpose())
+container2.write('')
 
-st.title('BigCo 2021 budget')
-st.write("Revenues growing at a steady pace")
-st.dataframe(df.transpose())
-
-option = st.selectbox(
+option = container2.selectbox(
     'Select line item',
      df.columns)
 
-st.bar_chart(df[option])
-
+container2.bar_chart(df[option])
 
